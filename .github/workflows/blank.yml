@@ -37,3 +37,6 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+          nvfortran -acc -Minfo=accel main.f90 -o main
+          ./main
+
