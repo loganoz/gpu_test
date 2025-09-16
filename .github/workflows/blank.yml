@@ -7,8 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [gfortran, nvidia-hpc]
-        version: [13, 25.1]  # gfortran 13 and nvfortran 25.1
+        include:
+          - compiler: gfortran
+            version: 13
+          - compiler: nvidia-hpc
+            version: 25.1
 
     steps:
       - uses: actions/checkout@v4
