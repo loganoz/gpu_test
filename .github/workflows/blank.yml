@@ -16,6 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Install compiler first
+      - name: Setup Fortran
+        uses: fortran-lang/setup-fortran@v1.6.3
+        with:
+          compiler: ${{ matrix.compiler }}
+          version: ${{ matrix.version }}
+
       # Cache NVIDIA HPC SDK only for nvfortran
       - name: Cache NVIDIA HPC SDK
         if: matrix.compiler == 'nvidia-hpc'
@@ -25,13 +32,6 @@ jobs:
           key: nvhpc-${{ runner.os }}-v${{ matrix.version }}
           restore-keys: |
             nvhpc-${{ runner.os }}-
-
-      # Install compiler
-      - name: Setup Fortran
-        uses: fortran-lang/setup-fortran@v1.6.3
-        with:
-          compiler: ${{ matrix.compiler }}
-          version: ${{ matrix.version }}
 
       # Build
       - name: Build
