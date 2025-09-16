@@ -8,9 +8,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - compiler: gfortran
+          - compiler: gcc           # GNU Fortran
             version: 13
-          - compiler: nvidia-hpc
+          - compiler: nvidia-hpc    # NVIDIA HPC SDK
             version: 25.1
 
     steps:
