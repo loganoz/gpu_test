@@ -8,9 +8,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - compiler: gcc           # GNU Fortran
+          - compiler: gcc
             version: 13
-          - compiler: nvidia-hpc    # NVIDIA HPC SDK
+          - compiler: nvidia-hpc
             version: 25.1
 
     steps:
@@ -28,7 +28,9 @@ jobs:
         if: matrix.compiler == 'nvidia-hpc'
         uses: actions/cache@v4
         with:
-          path: ~/.fortran-lang/cache/nvidia-hpc
+          # This is the actual path setup-fortran installs the SDK to
+          path: |
+            ~/.fortran-lang/cache/nvidia-hpc/linux-x86_64-${{ matrix.version }}
           key: nvhpc-${{ runner.os }}-v${{ matrix.version }}
           restore-keys: |
             nvhpc-${{ runner.os }}-
