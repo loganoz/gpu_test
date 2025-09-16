@@ -29,6 +29,9 @@ jobs:
       - name: Run a one-line script
         run: echo Hello, world!
 
+      - name: Setup Fortran
+        uses: fortran-lang/setup-fortran@v1.6.3
+        
       # Runs a set of commands using the runners shell
       - name: Run a multi-line script
         run: |
