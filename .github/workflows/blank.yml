@@ -3,32 +3,42 @@ name: Fortran CI
 on: [push, pull_request]
 
 jobs:
-  cpu-gfortran:
-    name: Build & Run (gfortran CPU)
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Fortran (gfortran)
-        uses: fortran-lang/setup-fortran@v1.6.3
-        with:
-          compiler: gcc          # or gfortran
-          version: 13            # version you want
-      - name: Build
-        run: ${{ env.FC }} main.f90 -o main   # env.FC is provided by setup-fortran
-      - name: Run
-        run: ./main
+    strategy:
+      matrix:
+        compiler: [gfortran, nvidia-hpc]
+        version: [13, 25.1]  # gfortran 13 and nvfortran 25.1
 
-  openacc-nvfortran:
-    name: Build & Run (nvfortran + OpenACC)
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Fortran (nvfortran)
+
+      # Cache NVIDIA HPC SDK only for nvfortran
+      - name: Cache NVIDIA HPC SDK
+        if: matrix.compiler == 'nvidia-hpc'
+        uses: actions/cache@v4
+        with:
+          path: ~/.fortran-lang/cache/nvidia-hpc
+          key: nvhpc-${{ runner.os }}-v${{ matrix.version }}
+          restore-keys: |
+            nvhpc-${{ runner.os }}-
+
+      # Install compiler
+      - name: Setup Fortran
         uses: fortran-lang/setup-fortran@v1.6.3
         with:
-          compiler: nvidia-hpc    # this picks nvfortran
-          version: 25.1           # or another version that supports your OpenACC needs
-      - name: Build with nvfortran
-        run: ${{ env.FC }} -acc -Minfo=accel main.f90 -o main
+          compiler: ${{ matrix.compiler }}
+          version: ${{ matrix.version }}
+
+      # Build
+      - name: Build
+        run: |
+          if [ "${{ matrix.compiler }}" == "nvidia-hpc" ]; then
+            ${{ env.FC }} -acc -Minfo=accel main.f90 -o main
+          else
+            ${{ env.FC }} main.f90 -o main
+          fi
+
+      # Run
       - name: Run
         run: ./main
